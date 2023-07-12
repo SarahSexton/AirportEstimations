@@ -35,68 +35,86 @@
         }
     </style>
     <script>
-        var convertTo12HourCalled = false;
-        function formatTime(date) {
-            var hours = date.getHours().toString().padStart(2, '0');
-            var minutes = date.getMinutes().toString().padStart(2, '0');
-            return hours + ':' + minutes;
-        }
-        function convertTo12Hour() {
-            var input = document.getElementById('hourInput').value;
-            var hour = parseInt(input);
-            if (hour >= 1 && hour <= 12) {
-                var convertedHour = (hour + 12) % 24;
-                document.getElementById('convertedTime').innerHTML = 'Converted Time: ' + convertedHour;
-            } else {
-                document.getElementById('convertedTime').innerHTML = 'Invalid input. Please enter a number between 1 and 12.';
-            }
-            convertTo12HourCalled = true;
-        }
-        function calculateTimes() {
-            var departureTime = document.getElementById('departureTime').value;
-            var securityWait = parseInt(document.getElementById('securityWait').value);
-            var commuteTime = parseInt(document.getElementById('commuteTime').value);
+    // Variable to track if the 'convertTo12Hour' function has been called
+    var convertTo12HourCalled = false;
 
-            var departTime = new Date('01/01/2000 ' + departureTime);
-            var boardingTime = new Date(departTime - 30 * 60000);
-            var walkToGateTime = new Date(boardingTime - 10 * 60000);
-            var finishTSATime = new Date(walkToGateTime - 10 * 60000);
-            var securityTime = new Date(finishTSATime - securityWait * 60000);
-            var commuteToAirportTime = new Date(securityTime - commuteTime * 60000);
-            var leaveHouseTime = new Date(commuteToAirportTime - 15 * 60000);
-            var dressedAndPackedTime = new Date(leaveHouseTime - 60 * 60000);
-            var resultElement = document.getElementById('result');
-            resultElement.innerHTML = ''; // Clear previous results
-            var displayResult = function (label, time) {
-                var formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                var paragraph = document.createElement('p');
-                paragraph.innerText = label + ': ' + formattedTime;
-                resultElement.appendChild(paragraph);
+    // Function to format the time as HH:MM
+    function formatTime(date) {
+        var hours = date.getHours().toString().padStart(2, '0'); // Get hours and pad with leading zero if necessary
+        var minutes = date.getMinutes().toString().padStart(2, '0'); // Get minutes and pad with leading zero if necessary
+        return hours + ':' + minutes; // Return formatted time string
+    }
+
+    // Function to convert time to 12-hour format
+    function convertTo12Hour() {
+        var input = document.getElementById('hourInput').value; // Get input value from 'hourInput' element
+        var hour = parseInt(input); // Parse input as an integer
+
+        // Check if the input is a valid hour (between 1 and 12)
+        if (hour >= 1 && hour <= 12) {
+            var convertedHour = (hour + 12) % 24; // Convert hour to 24-hour format
+            document.getElementById('convertedTime').innerHTML = 'Converted Time: ' + convertedHour; // Update 'convertedTime' element with converted time
+        } else {
+            document.getElementById('convertedTime').innerHTML = 'Invalid input. Please enter a number between 1 and 12.'; // Display error message for invalid input
+        }
+
+        convertTo12HourCalled = true; // Set flag to indicate that 'convertTo12Hour' function has been called
+    }
+
+    // Function to calculate various times based on user input
+    function calculateTimes() {
+        var departureTime = document.getElementById('departureTime').value; // Get departure time value from 'departureTime' element
+        var securityWait = parseInt(document.getElementById('securityWait').value); // Get security wait time value from 'securityWait' element
+        var commuteTime = parseInt(document.getElementById('commuteTime').value); // Get commute time value from 'commuteTime' element
+
+        // Create Date objects for each calculated time
+        var departTime = new Date('01/01/2000 ' + departureTime);
+        var boardingTime = new Date(departTime - 30 * 60000);
+        var walkToGateTime = new Date(boardingTime - 10 * 60000);
+        var finishTSATime = new Date(walkToGateTime - 10 * 60000);
+        var securityTime = new Date(finishTSATime - securityWait * 60000);
+        var commuteToAirportTime = new Date(securityTime - commuteTime * 60000);
+        var leaveHouseTime = new Date(commuteToAirportTime - 15 * 60000);
+        var dressedAndPackedTime = new Date(leaveHouseTime - 60 * 60000);
+
+        var resultElement = document.getElementById('result');
+        resultElement.innerHTML = ''; // Clear previous results
+
+        // Function to display a calculated time with its label
+        var displayResult = function (label, time) {
+            var formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Format time as HH:MM
+            var paragraph = document.createElement('p');
+            paragraph.innerText = label + ': ' + formattedTime;
+            resultElement.appendChild(paragraph);
+        };
+
+        // Display calculated times with labels
+        displayResult('Depart', departTime);
+        displayResult('Boarding', boardingTime);
+        displayResult('Walk to Gate', walkToGateTime);
+        displayResult('Finish TSA', finishTSATime);
+        displayResult('Security Time', securityTime);
+        displayResult('Commute to Airport Time', commuteToAirportTime);
+        displayResult('Leave House Time', leaveHouseTime);
+        displayResult('Dressed and Packed Time', dressedAndPackedTime);
+
+        if (convertTo12HourCalled) {
+            // Function to convert times to 12-hour format
+            function meridiemMath() {
+                var times = resultElement.querySelectorAll('p'); // Get all <p> elements within 'resultElement'
+                times.forEach(function (time) {
+                    var timeValue = time.innerText;
+                    var hour = parseInt(timeValue.split(':')[1].trim().split(' ')[0]); // Extract hour from the time string
+                    var period = (hour >= 12) ? 'PM' : 'AM'; // Determine if it's AM or PM
+                    var convertedHour = (hour % 12) || 12; // Convert hour to 12-hour format
+                    time.innerText = timeValue.replace(hour, convertedHour + ' ' + period); // Replace hour in the time string with converted hour and period
+                });
+                resultElement.removeChild(convertButton); // Remove the 'convertButton' element
             };
-            displayResult('Depart', departTime);
-            displayResult('Boarding', boardingTime);
-            displayResult('Walk to Gate', walkToGateTime);
-            displayResult('Finish TSA', finishTSATime);
-            displayResult('Security Time', securityTime);
-            displayResult('Commute to Airport Time', commuteToAirportTime);
-            displayResult('Leave House Time', leaveHouseTime);
-            displayResult('Dressed and Packed Time', dressedAndPackedTime);
-
-            if (convertTo12HourCalled) {
-                function meridiemMath () {
-                    var times = resultElement.querySelectorAll('p');
-                    times.forEach(function (time) {
-                        var timeValue = time.innerText;
-                        var hour = parseInt(timeValue.split(':')[1].trim().split(' ')[0]);
-                        var period = (hour >= 12) ? 'PM' : 'AM';
-                        var convertedHour = (hour % 12) || 12;
-                        time.innerText = timeValue.replace(hour, convertedHour + ' ' + period);
-                    });
-                    resultElement.removeChild(convertButton);
-                };
-            }
         }
-    </script>
+    }
+</script>
+
     </body>
 </head>
 <body>
