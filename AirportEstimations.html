@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Airport Estimations</title>
@@ -8,17 +9,20 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         label {
             font-weight: bold;
             display: block;
             margin-top: 10px;
         }
+
         input[type="text"] {
             width: 200px;
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
         button {
             padding: 10px 20px;
             background-color: #4CAF50;
@@ -27,106 +31,109 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         #result {
             margin-top: 20px;
             font-weight: bold;
         }
     </style>
     <script>
-    // Variable to track if the 'convertTo12Hour' function has been called
-    var convertTo12HourCalled = false;
+        // Variable to track if the 'convertTo12Hour' function has been called
+        var convertTo12HourCalled = false;
 
-    // Function to format the time as HH:MM
-    function formatTime(date) {
-        var hours = date.getHours().toString().padStart(2, '0'); // Get hours and pad with leading zero if necessary
-        var minutes = date.getMinutes().toString().padStart(2, '0'); // Get minutes and pad with leading zero if necessary
-        return hours + ':' + minutes; // Return formatted time string
-    }
-
-    // Function to convert time to 12-hour format
-    function convertTo12Hour() {
-        var input = document.getElementById('hourInput').value; // Get input value from 'hourInput' element
-        var hour = parseInt(input); // Parse input as an integer
-
-        // Check if the input is a valid hour (between 1 and 12)
-        if (hour >= 1 && hour <= 12) {
-            var convertedHour = (hour + 12) % 24; // Convert hour to 24-hour format
-            document.getElementById('convertedTime').innerHTML = 'Converted Time: ' + convertedHour; // Update 'convertedTime' element with converted time
-        } else {
-            document.getElementById('convertedTime').innerHTML = 'Invalid input. Please enter a number between 1 and 12.'; // Display error message for invalid input
+        // Function to format the time as HH:MM
+        function formatTime(date) {
+            var hours = date.getHours().toString().padStart(2, '0'); // Get hours and pad with leading zero if necessary
+            var minutes = date.getMinutes().toString().padStart(2, '0'); // Get minutes and pad with leading zero if necessary
+            return hours + ':' + minutes; // Return formatted time string
         }
 
-        convertTo12HourCalled = true; // Set flag to indicate that 'convertTo12Hour' function has been called
-    }
+        // Function to convert time to 12-hour format
+        function convertTo12Hour() {
+            var input = document.getElementById('hourInput').value; // Get input value from 'hourInput' element
+            var hour = parseInt(input); // Parse input as an integer
 
-    // Function to calculate various times based on user input
-    function calculateTimes() {
-        var departureTime = document.getElementById('departureTime').value; // Get departure time value from 'departureTime' element
-        var securityWait = parseInt(document.getElementById('securityWait').value); // Get security wait time value from 'securityWait' element
-        var commuteTime = parseInt(document.getElementById('commuteTime').value); // Get commute time value from 'commuteTime' element
+            // Check if the input is a valid hour (between 1 and 12)
+            if (hour >= 1 && hour <= 12) {
+                var convertedHour = (hour + 12) % 24; // Convert hour to 24-hour format
+                document.getElementById('convertedTime').innerHTML = 'Converted Time: ' + convertedHour; // Update 'convertedTime' element with converted time
+            } else {
+                document.getElementById('convertedTime').innerHTML = 'Invalid input. Please enter a number between 1 and 12.'; // Display error message for invalid input
+            }
 
-        // Create Date objects for each calculated time
-        var departTime = new Date('01/01/2000 ' + departureTime);
-        var boardingTime = new Date(departTime - 30 * 60000);
-        var walkToGateTime = new Date(boardingTime - 10 * 60000);
-        var finishTSATime = new Date(walkToGateTime - 10 * 60000);
-        var securityTime = new Date(finishTSATime - securityWait * 60000);
-        var commuteToAirportTime = new Date(securityTime - commuteTime * 60000);
-        var leaveHouseTime = new Date(commuteToAirportTime - 15 * 60000);
-        var dressedAndPackedTime = new Date(leaveHouseTime - 60 * 60000);
+            convertTo12HourCalled = true; // Set flag to indicate that 'convertTo12Hour' function has been called
+        }
 
-        var resultElement = document.getElementById('result');
-        resultElement.innerHTML = ''; // Clear previous results
+        // Function to calculate various times based on user input
+        function calculateTimes() {
+            var departureTime = document.getElementById('departureTime').value; // Get departure time value from 'departureTime' element
+            var securityWait = parseInt(document.getElementById('securityWait').value); // Get security wait time value from 'securityWait' element
+            var commuteTime = parseInt(document.getElementById('commuteTime').value); // Get commute time value from 'commuteTime' element
 
-        // Function to display a calculated time with its label
-        var displayResult = function (label, time) {
-            var formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Format time as HH:MM
-            var paragraph = document.createElement('p');
-            paragraph.innerText = label + ': ' + formattedTime;
-            resultElement.appendChild(paragraph);
-        };
+            // Create Date objects for each calculated time
+            var departTime = new Date('01/01/2000 ' + departureTime);
+            var boardingTime = new Date(departTime - 30 * 60000);
+            var walkToGateTime = new Date(boardingTime - 10 * 60000);
+            var finishTSATime = new Date(walkToGateTime - 10 * 60000);
+            var securityTime = new Date(finishTSATime - securityWait * 60000);
+            var commuteToAirportTime = new Date(securityTime - commuteTime * 60000);
+            var leaveHouseTime = new Date(commuteToAirportTime - 15 * 60000);
+            var dressedAndPackedTime = new Date(leaveHouseTime - 60 * 60000);
 
-        // Display calculated times with labels
-        displayResult('Depart', departTime);
-        displayResult('Boarding', boardingTime);
-        displayResult('Walk to Gate', walkToGateTime);
-        displayResult('Finish TSA', finishTSATime);
-        displayResult('Security Time', securityTime);
-        displayResult('Commute to Airport Time', commuteToAirportTime);
-        displayResult('Leave House Time', leaveHouseTime);
-        displayResult('Dressed and Packed Time', dressedAndPackedTime);
+            var resultElement = document.getElementById('result');
+            resultElement.innerHTML = ''; // Clear previous results
 
-        if (convertTo12HourCalled) {
-            // Function to convert times to 12-hour format
-            function meridiemMath() {
-                var times = resultElement.querySelectorAll('p'); // Get all <p> elements within 'resultElement'
-                times.forEach(function (time) {
-                    var timeValue = time.innerText;
-                    var hour = parseInt(timeValue.split(':')[1].trim().split(' ')[0]); // Extract hour from the time string
-                    var period = (hour >= 12) ? 'PM' : 'AM'; // Determine if it's AM or PM
-                    var convertedHour = (hour % 12) || 12; // Convert hour to 12-hour format
-                    time.innerText = timeValue.replace(hour, convertedHour + ' ' + period); // Replace hour in the time string with converted hour and period
-                });
-                resultElement.removeChild(convertButton); // Remove the 'convertButton' element
+            // Function to display a calculated time with its label
+            var displayResult = function (label, time) {
+                var formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Format time as HH:MM
+                var paragraph = document.createElement('p');
+                paragraph.innerText = label + ': ' + formattedTime;
+                resultElement.appendChild(paragraph);
             };
+
+            // Display calculated times with labels
+            displayResult('Depart', departTime);
+            displayResult('Boarding', boardingTime);
+            displayResult('Walk to Gate', walkToGateTime);
+            displayResult('Finish TSA', finishTSATime);
+            displayResult('Security Time', securityTime);
+            displayResult('Commute to Airport Time', commuteToAirportTime);
+            displayResult('Leave House Time', leaveHouseTime);
+            displayResult('Dressed and Packed Time', dressedAndPackedTime);
+
+            if (convertTo12HourCalled) {
+                // Function to convert times to 12-hour format
+                function meridiemMath() {
+                    var times = resultElement.querySelectorAll('p'); // Get all <p> elements within 'resultElement'
+                    times.forEach(function (time) {
+                        var timeValue = time.innerText;
+                        var hour = parseInt(timeValue.split(':')[1].trim().split(' ')[0]); // Extract hour from the time string
+                        var period = (hour >= 12) ? 'PM' : 'AM'; // Determine if it's AM or PM
+                        var convertedHour = (hour % 12) || 12; // Convert hour to 12-hour format
+                        time.innerText = timeValue.replace(hour, convertedHour + ' ' + period); // Replace hour in the time string with converted hour and period
+                    });
+                    resultElement.removeChild(convertButton); // Remove the 'convertButton' element
+                };
+            }
         }
-    }
 
 // Stretch goals: 
         // "International/Domestic" toggle (adds/subtracts 20 minutes)
         // Eat a meal Yes/No toggle (adds/subtracts 30 minutes)
-        // Grab map of airport terminals 
+        // Grab map of airport terminals
         // Google Maps Traffic API
         // TSA Wait Times API
         // Airlines realtime data API
-        
-</script>
+
+    </script>
 
     </body>
 </head>
+
 <body>
     <h1>Airport Estimations</h1>
     <!-- 24-hour to 12-hour Converter section -->
@@ -153,5 +160,14 @@
         <div id="result"></div>
         <div id="convertedResult"></div>
     </div>
+    <div>
+        <h4><a href="https://maps.google.com/maps?saddr=&daddr=SeaTac+WA" target="_blank">Open Google Maps</a></h4>
+    </div>
+    <div>
+    <iframe referrerpolicy="no-referrer-when-downgrade"
+    src="https://embed.waze.com/iframe?zoom=10&lat=47.44815&lon=-122.30986&pin=1" 
+    width="350" height="350"></iframe>
+    </div>
 </body>
+
 </html>
